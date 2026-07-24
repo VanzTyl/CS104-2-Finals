@@ -1076,7 +1076,7 @@ void generateRefundRequests() {
             req.isValidReason = false;
         }
 
-        strncpy(masterPurchases[targetIdx].refundStatus, "Refund Ongoing", 25);
+        strncpy(masterPurchases[targetIdx].refundStatus, "Refund Ongoing", 20);
         req.purchaseRecord = masterPurchases[targetIdx];
 
         enqueueRefund(req);
