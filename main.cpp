@@ -314,8 +314,8 @@ void drawHeader(string title) {
     for (int i = 0; i < rightPad; i++) cout << " ";
     cout << ver_br << "\n";
 
-    cout << bl_br; 
-    for (int i = 0; i < 78; i++) cout << hor_br; 
+    cout << bl_br;
+    for (int i = 0; i < 78; i++) cout << hor_br;
     cout << br_br << "\n";
 }
 
@@ -340,11 +340,15 @@ void printColumns(string col1, string col2, string col3) {
 }
 
 void printInfoLine(string label, string value) {
-    cout << ver_br << " " << left << setw(18) << label << setw(39) << value << ver_br << "\n";
+    string line = " " + label;
+    while ((int)line.length() < 1 + 22) line += " ";
+    line += value;
+    while ((int)line.length() < 1 + 77) line += " ";
+    cout << ver_br << line << ver_br << "\n";
 }
 
 void printInfoSpacer() {
-    cout << ver_br << " " << left << setw(57) << "" << ver_br << "\n";
+    cout << ver_br << " " << string(77, ' ') << ver_br << "\n";
 }
 
 string formatDecimal(double amount) {
@@ -473,7 +477,12 @@ int showStartupMenu() {
 
         cout << "\nSelect save file [1-" << saveCount << "]: ";
         int fileChoice;
-        cin >> fileChoice;
+        if (!(cin >> fileChoice)) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "\nInvalid input. Starting new game.\n";
+            return 0;
+        }
         if (fileChoice < 1 || fileChoice > saveCount) {
             cout << "Invalid choice. Starting new game.\n";
             return 0;
@@ -1093,9 +1102,14 @@ void generatePurchasesAndRequests() {
 
     int choice;
     cout << "\nChoice: ";
-    cin >> choice;
+    if (!(cin >> choice)) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "\nInvalid input.\n";
+        waitForEnter();
+        return;
+    }
     cin.ignore(1000, '\n');
-    cin.clear();
 
     if (choice == 1) {
         generateTicketPurchases();
@@ -1136,7 +1150,13 @@ void reviewRefundRequests() {
     drawFooter();
     cout << "Choice: ";
     int choice;
-    cin >> choice;
+    if (!(cin >> choice)) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "\nInvalid input.\n";
+        waitForEnter();
+        return;
+    }
 
     bool approved = (choice == 1);
 
@@ -1215,7 +1235,13 @@ void searchPurchaseRecord() {
 
     cout << "\nEnter Purchase ID to search: ";
     int searchID;
-    cin >> searchID;
+    if (!(cin >> searchID)) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "\nInvalid input.\n";
+        waitForEnter();
+        return;
+    }
 
     int resultIdx = binarySearchPurchaseByID(searchID);
 
@@ -1295,8 +1321,13 @@ void endDaySummary() {
 
     if (activeEventCount > 0) {
         cout << "\nWould you like to view team standings? (1 = Yes, 2 = No): ";
-        int viewChoice;
-        cin >> viewChoice;
+        int viewChoice = 2;
+        if (!(cin >> viewChoice)) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "\nInvalid input. Skipping standings.\n";
+            waitForEnter();
+        }
         if (viewChoice == 1) {
             clearScreen();
             drawHeader("SELECT EVENT");
@@ -1306,8 +1337,13 @@ void endDaySummary() {
             }
             drawFooter();
             cout << "Choice: ";
-            int evChoice;
-            cin >> evChoice;
+            int evChoice = 1;
+            if (!(cin >> evChoice)) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "\nInvalid input. Returning to menu.\n";
+                waitForEnter();
+            }
             if (evChoice >= 1 && evChoice <= activeEventCount) {
                 clearScreen();
                 drawHeader("TEAM STANDINGS LEADERBOARD");
@@ -1376,9 +1412,14 @@ void optionsAndExtraSettings() {
         drawFooter();
 
         cout << "\nChoice: ";
-        cin >> choice;
+        if (!(cin >> choice)) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "\nInvalid input.\n";
+            waitForEnter();
+            continue;
+        }
         cin.ignore(1000, '\n');
-        cin.clear();
 
         switch (choice) {
             case 1:
@@ -1420,6 +1461,7 @@ void configureGenerationSettings() {
             cout << "Enter min purchases (1-20): ";
             int val;
             cin >> val;
+            if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); cout << "Invalid.\n"; continue; }
             if (val >= 1 && val <= 20 && val <= genPurchasesMax) {
                 genPurchasesMin = val;
                 cout << "Updated.\n";
@@ -1430,6 +1472,7 @@ void configureGenerationSettings() {
             cout << "Enter max purchases (1-50): ";
             int val;
             cin >> val;
+            if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); cout << "Invalid.\n"; continue; }
             if (val >= 1 && val <= 50 && val >= genPurchasesMin) {
                 genPurchasesMax = val;
                 cout << "Updated.\n";
@@ -1440,6 +1483,7 @@ void configureGenerationSettings() {
             cout << "Enter base price per match ($): ";
             double val;
             cin >> val;
+            if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); cout << "Invalid.\n"; continue; }
             if (val >= 1.0 && val <= 1000.0) {
                 genPricePerMatch = val;
                 cout << "Updated.\n";
@@ -1450,6 +1494,7 @@ void configureGenerationSettings() {
             cout << "Enter price variance ($0-$100): ";
             double val;
             cin >> val;
+            if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); cout << "Invalid.\n"; continue; }
             if (val >= 0 && val <= 100 && val <= genPricePerMatch) {
                 genPriceVariance = val;
                 cout << "Updated.\n";
@@ -1460,6 +1505,7 @@ void configureGenerationSettings() {
             cout << "Enter refunds per generation (1-10): ";
             int val;
             cin >> val;
+            if (cin.fail()) { cin.clear(); cin.ignore(1000, '\n'); cout << "Invalid.\n"; continue; }
             if (val >= 1 && val <= 10) {
                 genRefundCount = val;
                 cout << "Updated.\n";
@@ -1511,9 +1557,14 @@ void managePurchases() {
         drawFooter();
 
         cout << "\nChoice: ";
-        cin >> choice;
+        if (!(cin >> choice)) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "\nInvalid input.\n";
+            waitForEnter();
+            continue;
+        }
         cin.ignore(1000, '\n');
-        cin.clear();
 
         if (choice == 1) {
             showAllPurchases();
@@ -1596,7 +1647,13 @@ void searchRefundByID() {
     clearScreen();
     cout << "\nEnter Refund Request ID to search: ";
     int searchID;
-    cin >> searchID;
+    if (!(cin >> searchID)) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "\nInvalid input.\n";
+        waitForEnter();
+        return;
+    }
 
     bool found = false;
 
@@ -1674,9 +1731,14 @@ void manageRefunds() {
         drawFooter();
 
         cout << "\nChoice: ";
-        cin >> choice;
+        if (!(cin >> choice)) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "\nInvalid input.\n";
+            waitForEnter();
+            continue;
+        }
         cin.ignore(1000, '\n');
-        cin.clear();
 
         if (choice == 1) {
             reviewRefundRequests();
@@ -2062,8 +2124,13 @@ void saveAndExit() {
 #endif
         if (exists) {
             cout << "File already exists. Overwrite? (1 = Yes, 2 = No): ";
-            int overwrite;
-            cin >> overwrite;
+            int overwrite = 2;
+            if (!(cin >> overwrite)) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "\nInvalid input. Using new filename.\n";
+                overwrite = 2;
+            }
             if (overwrite == 1) {
                 // use the existing filename as-is (will overwrite)
             } else {
